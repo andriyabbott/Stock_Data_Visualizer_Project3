@@ -6,32 +6,37 @@ import pandas as pd
 API_URL = "https://www.alphavantage.co/query"
 API_KEY = "X0AWJSYKTOKX2F5E"
 
-def getData(symbol,timeSeries,startDate,endDate):
+def getData(symbol,timeSeries,chartType, startDate,endDate):
 
     ts = TimeSeries(key=API_KEY, output_format='pandas')
     if timeSeries == '1':
-        data, meta_data = ts.get_intraday(symbol=symbol, interval='15min', outputsize='full')
+        data, meta_data = ts.get_intraday(symbol=symbol, interval='60min', outputsize='full')
+        f = 'H'
     if timeSeries == '2':
         data, meta_data = ts.get_daily(symbol=symbol, outputsize='compact')
+        f = 'D'
     if timeSeries == '3':
         data, meta_data = ts.get_weekly(symbol=symbol)
+        f = 'W'
     if timeSeries == '4':
         data, meta_data = ts.get_monthly(symbol=symbol)
-    data_date_changed = data[:startDate]
-    print(data_date_changed)
+        f = 'M'
+
+    data_date_changed = data[endDate:startDate]
+
+    if chartType == "2":
+        line_chart = pygal.Line(x_label_rotation=20, spacing=80)
+        line_chart.title = 'Stock Data for {}: {} to {}'.format(symbol, startDate, endDate)
+        
+        line_chart.x_labels= pd.date_range(start=startDate, end=endDate, freq= f)
+        
+        line_chart.add("Open", data_date_changed['1. open'])
+        line_chart.add("High", data_date_changed['2. high'])
+        line_chart.add("Low", data_date_changed['3. low'])
+        line_chart.add("Close", data_date_changed['4. close'])
+        line_chart.render_in_browser()
 
 
-def lineChart(symbol, beginDate, endDate):
-    from datetime import datetime, timedelta
-    line_chart = pygal.Line(x_label_rotation=20)
-    line_chart.title = 'Stock Data for {}: {} to {}'.format(symbol, beginDate, endDate)
-    line_chart.x_labels = map(lambda d: d.strftime('%Y-%m-%d'), [
-        datetime(2013, 1, 2), datetime(2013, 1, 12), datetime(2013, 2, 2), datetime(2013, 2, 22)])
-    line_chart.add("Open", [300, 412, 823, 672])
-    line_chart.add("High", [300, 412, 823, 672])
-    line_chart.add("Low", [300, 412, 823, 672])
-    line_chart.add("Close", [300, 412, 823, 672])
-    line_chart.render()
 def main():
 
     while(True):
@@ -51,7 +56,8 @@ def main():
             timeSeries = input("Enter time series option (1,2,3,4): ")
             startDate = input("\nEnter the start date (YYYY-MM-DD): ")
             endDate = input("\nEnter the end date (YYYY-MM-DD): ")
-            getData(symbol,timeSeries,startDate,endDate)
+            getData(symbol,timeSeries,chartType, startDate,endDate)
+
             
             again = input("Would you like to view more stock data? Press 'y' to continue: ")
             if (again.lower() != "y"):
