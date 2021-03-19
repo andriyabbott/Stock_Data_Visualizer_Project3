@@ -23,9 +23,19 @@ def getData(symbol,timeSeries,chartType, startDate,endDate):
         f = 'M'
 
     data_date_changed = data[endDate:startDate]
+    
+    if chartType == "1":
+        line_chart = pygal.Bar(x_label_rotation=20, width=1000, height = 400)
+        line_chart.title = 'Stock Data for {}:  {} to {}'.format(symbol, startDate, endDate)
+        line_chart.x_labels = pd.date_range(start=startDate, end=endDate, freq= f)
+        line_chart.add("Open", data_date_changed['1. open'])
+        line_chart.add("High", data_date_changed['2. high'])
+        line_chart.add("Low", data_date_changed['3. low'])
+        line_chart.add("Close", data_date_changed['4. close'])
+        line_chart.render_in_browser()
 
     if chartType == "2":
-        line_chart = pygal.Line(x_label_rotation=20, spacing=80)
+        line_chart = pygal.Line(x_label_rotation=20, width=1000, height = 400)
         line_chart.title = 'Stock Data for {}: {} to {}'.format(symbol, startDate, endDate)
         
         line_chart.x_labels= pd.date_range(start=startDate, end=endDate, freq= f)
@@ -35,16 +45,7 @@ def getData(symbol,timeSeries,chartType, startDate,endDate):
         line_chart.add("Low", data_date_changed['3. low'])
         line_chart.add("Close", data_date_changed['4. close'])
         line_chart.render_in_browser()
-        
-    if chartType == "1":
-        line_chart = pygal.Bar(x_label_rotation=20, spacing=80)
-        line_chart.title = 'Stock Data for {}:  {} to {}'.format(symbol, startDate, endDate)
-        line_chart.x_labels = pd.date_range(start=startDate, end=endDate, freq= f)
-        line_chart.add("Open", data_date_changed['1. open'])
-        line_chart.add("High", data_date_changed['2. high'])
-        line_chart.add("Low", data_date_changed['3. low'])
-        line_chart.add("Close", data_date_changed['4. close'])
-        line_chart.render_in_browser()
+       
 
 
 def main():
