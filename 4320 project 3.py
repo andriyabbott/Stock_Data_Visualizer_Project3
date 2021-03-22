@@ -2,6 +2,7 @@ import requests, pygal, lxml
 import alpha_vantage
 from alpha_vantage.timeseries import TimeSeries 
 import pandas as pd
+import time
 
 API_URL = "https://www.alphavantage.co/query"
 API_KEY = "X0AWJSYKTOKX2F5E"
@@ -47,8 +48,31 @@ def getData(symbol,timeSeries,chartType, startDate,endDate):
         line_chart.render_in_browser()
        
 
-
+def dCheck(startDate, endDate):
+    #Checks for execptions in to make sure user entered dates are in correct format
+    try:
+        #Converts user entered dates in to readable values
+        sDate = time.mktime(time.strptime(startDate, "%Y-%m-%d"))
+        eDate = time.mktime(time.strptime(endDate, "%Y-%m-%d"))
+        #Checks if end date given is before current date
+        if(eDate > time.time()):
+            print("\nERROR: End date can not be after the current date.")
+            return False
+        #Checks if start date given is before the given end date
+        if(sDate < eDate):
+            return True
+        else:
+            print("\nERROR: Start date must be before the end date.")
+            return False
+    except:
+        print("\nERROR: One, or both, of the given dates are not acceptable, try again.")
+        return False
+    
 def main():
+
+    #Lists of the acceptable options for the chart types and time series inputs
+    chartOptions = ("1", "2")
+    seriesOptions = ("1", "2", "3", "4")
 
     while(True):
         try:
@@ -56,25 +80,40 @@ def main():
             print("Stock Data Visualizer")
             print("-------------------------")
             symbol = input("Enter the stock symbol you are looking for: ")
-            
-            print("\nChart Type:")
-            print("-------------------------")
-            print("1. Bar\n2. Line\n")
-            chartType = input("Enter the chart type you want (1,2): ")
-            print("\nSelect the time series of the chart you want to generate")
-            print("-------------------------------------------------------------")
-            print("1.Intrady\n2. Daily\n3. Weekly\n4. Monthly")
-            timeSeries = input("Enter time series option (1,2,3,4): ")
-            startDate = input("\nEnter the start date (YYYY-MM-DD): ")
-            endDate = input("\nEnter the end date (YYYY-MM-DD): ")
+
+            while(True):
+                print("\nChart Type:")
+                print("-------------------------")
+                print("1. Bar\n2. Line\n")
+                chartType = input("Enter the chart type you want (1,2): ")
+                if (chartType in chartOptions):
+                    break
+                print("\nERROR: Input not acceptable, try again.")
+
+            while(True):
+                print("\nSelect the time series of the chart you want to generate")
+                print("-------------------------------------------------------------")
+                print("1.Intrady\n2. Daily\n3. Weekly\n4. Monthly")
+                timeSeries = input("Enter time series option (1,2,3,4): ")
+                if (timeSeries in seriesOptions):
+                    break
+                print("\nERROR: Input not acceptable, try again.")
+
+            while(True):    
+                startDate = input("\nEnter the start date (YYYY-MM-DD): ")
+                endDate = input("\nEnter the end date (YYYY-MM-DD): ")
+                if(dCheck(startDate, endDate)):
+                    break
+
             getData(symbol,timeSeries,chartType, startDate,endDate)
 
-            
-            again = input("Would you like to view more stock data? Press 'y' to continue: ")
-            if (again.lower() != "y"):
-                break
         except Exception as err:
             print (err)
+            print("\nERROR: ", err.__class__)
+            
+        again = input("Would you like to view more stock data? Press 'y' to continue: ")
+        if (again.lower() != "y"):
+            break
             
 
 main()
