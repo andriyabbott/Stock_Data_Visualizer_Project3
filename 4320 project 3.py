@@ -38,7 +38,7 @@ def getData(symbol, timeSeries, chartType, startDate, endDate):
         line_chart.render_in_browser()
 
     if chartType == "2":
-        line_chart = pygal.Line(x_label_rotation=20, spacing=80)
+        line_chart = pygal.Line(x_label_rotation=20, width=1000, height = 400)
         line_chart.title = 'Stock Data for {}: {} to {}'.format(symbol, startDate, endDate)
         labels = data_date_changed.index.to_list()
         line_chart.x_labels= reversed(labels)
